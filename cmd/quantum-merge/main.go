@@ -8,6 +8,7 @@ import (
 	"github.com/velocity-trinity/core/pkg/config"
 	"github.com/velocity-trinity/core/pkg/logger"
 	"github.com/velocity-trinity/core/pkg/scheduler"
+	"github.com/velocity-trinity/core/pkg/webhook"
 )
 
 var rootCmd = &cobra.Command{
@@ -23,7 +24,19 @@ var serveCmd = &cobra.Command{
 	Short: "Start the Quantum Merge Scheduler",
 	Run: func(cmd *cobra.Command, args []string) {
 		logger.Log.Info("Starting Quantum Merge Scheduler...")
-		scheduler.Run(4) // Start 4 workers
+		
+		queue := scheduler.NewMemoryQueue(100)
+		
+		// Start Workers
+		for i := 0; i < 4; i++ {
+			go scheduler.RunWorker(i, queue)
+		}
+		
+		// Start Webhook Server
+		server := webhook.NewServer(queue, "8090")
+		if err := server.ListenAndServe(); err != nil {
+			logger.Log.Fatal("Webhook server crashed: " + err.Error())
+		}
 	},
 }
 
