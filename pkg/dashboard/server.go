@@ -7,7 +7,6 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/velocity-trinity/core/pkg/logger"
 	"github.com/velocity-trinity/core/pkg/scheduler"
 )
 
