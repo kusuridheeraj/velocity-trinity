@@ -1,0 +1,52 @@
+name: Build Velocity Trinity
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go-version: [ '1.23' ]
+        os: [linux, windows, darwin]
+        arch: [amd64, arm64]
+        exclude:
+          - os: windows
+            arch: arm64 # Go Windows arm64 support is newer, skipping for MVP stability
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: ${{ matrix.go-version }}
+        cache-dependency-path: go.sum
+
+    - name: Build Dependency-CI
+      run: |
+        GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build -v -o build/dependency-ci-${{ matrix.os }}-${{ matrix.arch }} ./cmd/dependency-ci
+
+    - name: Build LivePatch Agent
+      run: |
+        GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build -v -o build/live-patch-agent-${{ matrix.os }}-${{ matrix.arch }} ./cmd/live-patch/agent
+
+    - name: Build LivePatch CLI
+      run: |
+        GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build -v -o build/live-patch-cli-${{ matrix.os }}-${{ matrix.arch }} ./cmd/live-patch/cli
+
+    - name: Build Quantum Merge
+      run: |
+        GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build -v -o build/quantum-merge-${{ matrix.os }}-${{ matrix.arch }} ./cmd/quantum-merge
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: velocity-trinity-${{ matrix.os }}-${{ matrix.arch }}
+        path: build/*
