@@ -6,6 +6,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/velocity-trinity/core/pkg/config"
+	"github.com/velocity-trinity/core/pkg/dashboard"
 	"github.com/velocity-trinity/core/pkg/logger"
 	"github.com/velocity-trinity/core/pkg/scheduler"
 	"github.com/velocity-trinity/core/pkg/webhook"
@@ -32,10 +33,16 @@ var serveCmd = &cobra.Command{
 			go scheduler.RunWorker(i, queue)
 		}
 		
-		// Start Webhook Server
+		// Setup Server
 		server := webhook.NewServer(queue, "8090")
+		
+		// Register Dashboard Routes
+		dashboard.RegisterRoutes(server.Router, queue)
+
+		// Start
+		logger.Log.Info("Dashboard available at http://localhost:8090/")
 		if err := server.ListenAndServe(); err != nil {
-			logger.Log.Fatal("Webhook server crashed: " + err.Error())
+			logger.Log.Fatal("Server crashed: " + err.Error())
 		}
 	},
 }

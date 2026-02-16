@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Velocity Trinity Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container py-5">
+        <h1 class="mb-4">🚀 Velocity Trinity Dashboard</h1>
+        
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Dependency CI</h5>
+                        <p class="card-text">Status: <span class="badge bg-success">Active</span></p>
+                        <p>Analyzed Files: <strong>142</strong></p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">LivePatch</h5>
+                        <p class="card-text">Status: <span class="badge bg-primary">Running</span></p>
+                        <p>Active Agents: <strong>3</strong></p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Quantum Merge</h5>
+                        <p class="card-text">Status: <span class="badge bg-warning text-dark">Processing</span></p>
+                        <p>Queue Depth: <strong id="queue-depth">0</strong></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-header">
+                Recent Jobs
+            </div>
+            <ul class="list-group list-group-flush" id="job-list">
+                <li class="list-group-item text-muted">Loading jobs...</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        async function fetchJobs() {
+            try {
+                const response = await fetch('/api/jobs');
+                const jobs = await response.json();
+                const list = document.getElementById('job-list');
+                const depth = document.getElementById('queue-depth');
+                
+                depth.innerText = jobs.length;
+                list.innerHTML = '';
+                
+                jobs.forEach(job => {
+                    const li = document.createElement('li');
+                    li.className = 'list-group-item d-flex justify-content-between align-items-center';
+                    
+                    let badgeClass = 'bg-secondary';
+                    if (job.Status === 'SUCCESS') badgeClass = 'bg-success';
+                    if (job.Status === 'FAILED') badgeClass = 'bg-danger';
+                    if (job.Status === 'RUNNING') badgeClass = 'bg-primary';
+                    if (job.Status === 'SPECULATIVE') badgeClass = 'bg-info text-dark';
+
+                    li.innerHTML = `
+                        <div>
+                            <strong>${job.ID}</strong> (PR #${job.PRNumber})
+                            <br>
+                            <small class="text-muted">Base: PR #${job.BasePR}</small>
+                        </div>
+                        <span class="badge ${badgeClass} rounded-pill">${job.Status}</span>
+                    `;
+                    list.appendChild(li);
+                });
+            } catch (e) {
+                console.error("Failed to fetch jobs", e);
+            }
+        }
+
+        // Poll every 2 seconds
+        setInterval(fetchJobs, 2000);
+        fetchJobs();
+    </script>
+</body>
+</html>

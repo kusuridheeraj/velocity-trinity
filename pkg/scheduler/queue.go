@@ -60,3 +60,16 @@ func (q *MemoryQueue) Get(id string) (*Job, error) {
 	}
 	return job, nil
 }
+
+// ListAll returns a copy of all jobs (for Dashboard)
+func (q *MemoryQueue) ListAll() []*Job {
+	q.mu.RLock()
+	defer q.mu.RUnlock()
+	
+	list := make([]*Job, 0, len(q.jobs))
+	for _, job := range q.jobs {
+		// Return copy to be safe? For MVP, pointer is fine (read-only usage)
+		list = append(list, job)
+	}
+	return list
+}
