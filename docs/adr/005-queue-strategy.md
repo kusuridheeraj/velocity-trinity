@@ -2,7 +2,7 @@
 
 ## Context
 Product C (`quantum-merge`) requires a job queue to manage speculative CI runs. The original plan called for Redis.
-However, we want the initial "Day 21" MVP to be easily runnable by users without setting up external infrastructure like Redis or PostgreSQL.
+However, we want the initial MVP to be easily runnable by users without setting up external infrastructure like Redis or PostgreSQL.
 
 ## Decision
 We will define a `Queue` interface and provide two implementations:

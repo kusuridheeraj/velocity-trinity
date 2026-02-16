@@ -13,7 +13,7 @@ Key Requirements:
 3.  **Go `net/rpc` (Gob)**: Built-in to Go standard library, efficient binary encoding, zero external dependencies.
 
 ## Decision
-We will use **Go `net/rpc` over TLS** for the MVP (Days 1-21).
+We will use **Go `net/rpc` over TLS** for the MVP.
 
 ## Rationale
 1.  **Zero Dependency**: No need for users or CI to install the Protocol Buffers compiler.

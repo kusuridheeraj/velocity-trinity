@@ -1,7 +1,7 @@
 # ADR-001: Monorepo Architecture
 
 ## Context
-We are building a suite of three interconnected DevOps tools: `dependency-ci`, `live-patch`, and `quantum-merge`. These tools share significant common functionality (logging, configuration, authentication, Kubernetes clients). The project timeline is aggressive (21 days) and requires rapid iteration.
+We are building a suite of three interconnected DevOps tools: `dependency-ci`, `live-patch`, and `quantum-merge`. These tools share significant common functionality (logging, configuration, authentication, Kubernetes clients). The project timeline requires rapid iteration and efficient code sharing.
 
 ## Decision
 We will adopt a **Monorepo** structure for all three projects.

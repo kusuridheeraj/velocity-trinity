@@ -29,7 +29,7 @@ func GetParser(filePath string) (LanguageParser, error) {
 // BuildDependencyGraph walks a directory and builds a dependency map
 // Map format: File -> List of Files that import it
 func BuildDependencyGraph(root string) (map[string][]string, error) {
-	// Not implemented yet - this will be the core of Day 3
+	// Not implemented yet - this will be the core of Phase 2
 	// For now, let's just return a placeholder
 	return nil, nil
 }

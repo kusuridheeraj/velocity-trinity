@@ -9,7 +9,7 @@ Product A (`dependency-ci`) needs to build a dependency graph of the codebase to
 3.  **Regex / Tokenization**: Fast, zero-dependency, but potential for false positives (e.g., matching imports inside comments).
 
 ## Decision
-We will use **Regex/Tokenization** for the Day 2-5 MVP phase.
+We will use **Regex/Tokenization** for the initial MVP phase.
 
 ## Rationale
 1.  **Speed**: Regex scanning is orders of magnitude faster than spinning up LSPs.

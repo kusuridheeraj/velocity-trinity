@@ -1,7 +1,7 @@
-# ADR-011: Reliability & Security Hardening (Phase 4)
+# ADR-011: Reliability & Security Hardening (Advanced Features)
 
 ## Context
-We are entering the "Day 15-18" phase. The tools work, but they are fragile.
+The MVP tools work, but they are fragile in enterprise environments.
 -   **Security**: CA management for mTLS is manual.
 -   **Reliability**: `dependency-ci` re-parses every file every time.
 
