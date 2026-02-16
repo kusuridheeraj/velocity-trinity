@@ -13,6 +13,7 @@ import (
 )
 
 var targetAddr string
+var restartCmd string
 
 var rootCmd = &cobra.Command{
 	Use:   "live-patch",
@@ -52,27 +53,32 @@ var syncCmd = &cobra.Command{
 
 		// Send Request
 		req := &transport.FileSyncRequest{
-			RelativePath: filePath, // Should be relative to project root
+			RelativePath: filePath,
 			Content:      content,
 			Mode:         uint32(info.Mode()),
 			Timestamp:    info.ModTime(),
+			PostSyncCommand: restartCmd,
 		}
 
 		resp, err := client.SyncFile(req)
 		if err != nil {
-			logger.Log.Fatal("Sync failed: " + err.Error())
+			logger.Log.Fatal("Sync RPC failed: " + err.Error())
 		}
 
 		if resp.Success {
-			fmt.Printf("Successfully synced %s to %s\n", filePath, targetAddr)
+			fmt.Printf("✅ Successfully synced %s to %s\n", filePath, targetAddr)
+			if restartCmd != "" {
+				fmt.Printf("🔄 Post-sync command output:\n%s\n", resp.Message)
+			}
 		} else {
-			fmt.Printf("Sync failed: %s\n", resp.Message)
+			fmt.Printf("❌ Sync failed: %s\n", resp.Message)
 		}
 	},
 }
 
 func main() {
 	syncCmd.Flags().StringVarP(&targetAddr, "target", "t", "localhost:8080", "Address of the LivePatch Agent")
+	syncCmd.Flags().StringVarP(&restartCmd, "restart", "r", "", "Command to run after sync (e.g. 'npm restart')")
 
 	rootCmd.AddCommand(syncCmd)
 

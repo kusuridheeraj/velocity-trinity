@@ -8,6 +8,9 @@ type FileSyncRequest struct {
 	Content      []byte
 	Mode         uint32
 	Timestamp    time.Time
+	
+	// PostSyncCommand: Command to execute after file sync
+	PostSyncCommand string
 }
 
 // FileSyncResponse represents the result of a sync operation

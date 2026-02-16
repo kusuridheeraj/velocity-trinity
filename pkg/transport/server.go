@@ -6,7 +6,9 @@ import (
 	"io/ioutil"
 	"net/rpc"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"strings"
 
 	"github.com/velocity-trinity/core/pkg/logger"
 )
@@ -44,8 +46,33 @@ func (s *LivePatchServer) SyncFile(req *FileSyncRequest, resp *FileSyncResponse)
 		return err
 	}
 
+	// Post-Sync Command Execution
+	if req.PostSyncCommand != "" {
+		logger.Log.Info("Executing post-sync command: " + req.PostSyncCommand)
+		
+		// Split command string carefully (this is simple, ignores quotes)
+		parts := strings.Fields(req.PostSyncCommand)
+		head := parts[0]
+		args := parts[1:]
+
+		cmd := exec.Command(head, args...)
+		cmd.Dir = s.BasePath // Execute in project root
+		
+		output, err := cmd.CombinedOutput()
+		if err != nil {
+			logger.Log.Error("Post-sync command failed: " + err.Error())
+			resp.Success = false
+			resp.Message = fmt.Sprintf("File synced, but command failed: %s\nOutput: %s", err.Error(), string(output))
+			return nil // Return nil error so RPC succeeds, but resp indicates failure
+		}
+		
+		logger.Log.Info("Command executed successfully")
+		resp.Message = fmt.Sprintf("File synced and command executed: %s", string(output))
+	} else {
+		resp.Message = "File synced successfully"
+	}
+
 	resp.Success = true
-	resp.Message = "File synced successfully"
 	return nil
 }
 
